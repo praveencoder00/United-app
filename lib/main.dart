@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:printing/printing.dart';
 import 'package:united_app/firebase_options.dart';
 import 'package:united_app/pages/completed_page.dart';
 import 'package:united_app/pages/invoice_preview_page.dart';
@@ -30,12 +31,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: '',
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
          textTheme: GoogleFonts.robotoSlabTextTheme(),
       ),
-      home: HomePage(),
+      home: InvoicePreviewPage(),
     ); 
   }
 }

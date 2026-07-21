@@ -62,15 +62,15 @@ class InvoicePdf {
                                 fontWeight: pw.FontWeight.bold,
                               ),
                             ),
+                            pw.SizedBox(height: 5),
 
                             pw.Text("No.115, New Jail Road"),
+                             pw.SizedBox(height: 5),
 
                             pw.Text("Madurai-625016"),
-
-                            pw.Text("GSTIN/UIN : 33BDUPS7026Q1Z2"),
-
+ pw.SizedBox(height: 5),
                             pw.Text("State Name : Tamil Nadu"),
-
+ pw.SizedBox(height: 5),
                             pw.Text("E-Mail : uniteditsolutions28@gmail.com"),
                           ],
                         ),
@@ -104,9 +104,7 @@ class InvoicePdf {
 
                             pw.SizedBox(height: 10),
 
-                            pw.Text("GSTIN/UIN : 33AAACV3775E1ZG"),
-
-                            pw.Text("State Name : Tamil Nadu, Code : 33"),
+                         
                           ],
                         ),
                       ),
@@ -185,17 +183,13 @@ class InvoicePdf {
 
                     _headCell("Description of Goods", 180),
 
-                    _headCell("HSN/SAC", 55),
+
 
                     _headCell("Quantity", 50),
 
-                    _headCell("Rate\n(Incl. Tax)", 65),
+                    _headCell("Rate", 65),
 
-                    _headCell("Rate", 55),
 
-                    _headCell("Per", 35),
-
-                    _headCell("Disc.%", 45),
 
                     _headCell("Amount", 45),
                   ],
@@ -205,12 +199,9 @@ class InvoicePdf {
               _itemRow(
                 "1",
                 "Dell Optiplex 3080 Desktop",
-                "8471",
+
                 "1",
                 "18,000.00",
-                "15,254.24",
-                "Nos",
-                "",
                 "18,000.00",
               ),
 
@@ -515,12 +506,8 @@ class InvoicePdf {
   static pw.Widget _itemRow(
     String sl,
     String description,
-    String hsn,
     String qty,
     String inclRate,
-    String rate,
-    String per,
-    String disc,
     String amount,
   ) {
     return pw.Container(
@@ -538,17 +525,10 @@ class InvoicePdf {
 
           _cell(description, 180, alignment: pw.Alignment.topLeft),
 
-          _cell(hsn, 55),
-
           _cell(qty, 50),
 
           _cell(inclRate, 65, alignment: pw.Alignment.centerRight),
 
-          _cell(rate, 55, alignment: pw.Alignment.centerRight),
-
-          _cell(per, 35),
-
-          _cell(disc, 45),
 
           _cell(amount, 45, alignment: pw.Alignment.centerRight),
         ],
@@ -575,7 +555,7 @@ class InvoicePdf {
   }
 
   static pw.Widget _emptyItemRow() {
-    return _itemRow("", "", "", "", "", "", "", "", "");
+    return _itemRow("", "", "", "", "", );
   }
 
   static pw.Widget _headCell(String text, double width) {

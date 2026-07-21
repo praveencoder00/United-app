@@ -22,7 +22,12 @@ class CompletedPage extends ConsumerWidget {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-       appBar: AppBar(title: Text('Completed machines')),
+       appBar: AppBar(title: Text('Completed machines'),leading: GestureDetector(
+        onTap: () {
+          ref.read(searchProvider.notifier).state = '';
+          Navigator.pop(context);
+        },
+        child: Icon(Icons.arrow_back_ios_new_rounded)),),
     
       body: machines.when(
         loading: () =>

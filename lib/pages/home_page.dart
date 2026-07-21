@@ -9,14 +9,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:united_app/utils/dialouges/simple_dialouges.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget{
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomePage> createState() => _HomePage();
+}
+
+class _HomePage extends ConsumerState<HomePage> {
+
+  @override
+  Widget build(BuildContext context) {
     final machines = ref.watch(machinesProvider);
     final selectedType = ref.watch(machineTypeFilterProvider);
     final search = ref.watch(searchProvider).toLowerCase();
+  
+
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -231,6 +239,8 @@ class HomePage extends ConsumerWidget {
             ListTile(
               leading: Icon(Icons.verified_rounded),
               onTap: () {
+                ref.read(searchProvider.notifier).state = '';
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => CompletedPage()),
