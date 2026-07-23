@@ -16,10 +16,14 @@ import 'package:url_launcher/url_launcher.dart';
 class MachineDetailPage extends ConsumerStatefulWidget {
   final int initialIndex;
   final String machineId;
+  final String cusName;
+  final String machineName;
   const MachineDetailPage({
     super.key,
     required this.initialIndex,
     required this.machineId,
+    required this.cusName,
+    required this.machineName,
   });
   @override
   ConsumerState<MachineDetailPage> createState() => _MachineDetailPage();
@@ -44,19 +48,6 @@ class _MachineDetailPage extends ConsumerState<MachineDetailPage> {
       child: Scaffold(
         floatingActionButton: widget.initialIndex == 1
             ? null
-            // 1==0 || 0==1
-            // ? FloatingActionButton(
-            //     onPressed: () async {
-            //       print(widget.initialIndex);
-            //       print(cusnumber);
-            //       print(paymentStatus);
-            //       final Uri url = Uri.parse(
-            //         "https://wa.me/91$cusnumber?text=${Uri.encodeComponent('Thanks for choosing United IT Solutions, your service request for machine ${machineLocal.machineName} is Completed. Please make your payment of *${machineLocal.finalAmount} Rs* soon.')}",
-            //       );
-            //       await launchUrl(url, mode: LaunchMode.externalApplication);
-            //     },
-            //     child: Icon(Icons.send),
-            //   )
             : FloatingActionButton(
                 onPressed: () async {
                   ProblemDialouge().addProblemDialogue(
@@ -69,11 +60,12 @@ class _MachineDetailPage extends ConsumerState<MachineDetailPage> {
         appBar: AppBar(
           title: Text('Machine Details'),
           leading: GestureDetector(
-        onTap: () {
-          ref.read(searchProvider.notifier).state = '';
-          Navigator.pop(context);
-        },
-        child: Icon(Icons.arrow_back_ios_new_rounded)),
+            onTap: () {
+              ref.read(searchProvider.notifier).state = '';
+              Navigator.pop(context);
+            },
+            child: Icon(Icons.arrow_back_ios_new_rounded),
+          ),
           actions: [
             GestureDetector(
               onTap: () async {
@@ -82,6 +74,8 @@ class _MachineDetailPage extends ConsumerState<MachineDetailPage> {
                   widget.machineId,
                   amountPaid,
                   finalAmount,
+                  widget.cusName,
+                  widget.machineName,
                 );
               },
               child: Padding(
@@ -139,97 +133,104 @@ class _MachineDetailPage extends ConsumerState<MachineDetailPage> {
                         'Amount Paid: ${data.amountPaid}',
                         style: TextStyle(fontSize: 18),
                       ),
-                     widget.initialIndex ==1? Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () async {
-                              if (data.status == 'Pending') {
-                                await SimpleDialouges().statusChangeDialouge(
-                                  context,
-                                  'On proccess',
-                                  data.id!,
-                                  data.customerNumber,
-                                  data.machineName,
-                                );
-                              } else if (data.status == 'On proccess') {
-                                if (data.finalAmount == null) {
-                                  SimpleDialouges().finalAmountDialouge(
-                                    context,
-                                    'Completed',
-                                    data.id!,
-                                  );
-                                  return;
-                                }
-                                if (data.amountPaid == data.finalAmount) {
-                                  await FirebaseFirestore.instance
-                                      .collection('machines')
-                                      .doc(data.id)
-                                      .update({'paymentStatus': 'Completed'});
-                                }
-                                await SimpleDialouges().statusChangeDialouge(
-                                  context,
-                                  'Completed',
-                                  data.id!,
-                                  data.customerNumber,
-                                  data.machineName,
-                                );
-                              }
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              padding: EdgeInsets.all(5),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: data.status == 'Pending'
-                                          ? Colors.red
-                                          : data.status == 'On proccess'
-                                          ? Colors.amber
-                                          : Colors.green,
-                                    ),
-                                    width: 10,
-                                    height: 10,
-                                  ),
-                                  SizedBox(width: 5),
-                                  Text(data.status),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Spacer(),
-                          Container(
-                            margin: EdgeInsets.symmetric(vertical: 8),
-                            padding: EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              border: Border.all(),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
+                      widget.initialIndex == 1
+                          ? Row(
                               children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: data.paymentStatus == 'Pending'
-                                        ? Colors.red
-                                        : Colors.green,
+                                GestureDetector(
+                                  onTap: () async {
+                                    if (data.status == 'Pending') {
+                                      await SimpleDialouges()
+                                          .statusChangeDialouge(
+                                            context,
+                                            'On proccess',
+                                            data.id!,
+                                            data.customerNumber,
+                                            data.machineName,
+                                            false
+                                          );
+                                    } else if (data.status == 'On proccess') {
+                                      if (data.finalAmount == null) {
+                                        SimpleDialouges().finalAmountDialouge(
+                                          context,
+                                          'Completed',
+                                          data.id!,
+                                          false
+                                        );
+                                        return;
+                                      }
+                                      if (data.amountPaid == data.finalAmount) {
+                                        await FirebaseFirestore.instance
+                                            .collection('machines')
+                                            .doc(data.id)
+                                            .update({
+                                              'paymentStatus': 'Completed',
+                                            });
+                                      }
+                                      await SimpleDialouges()
+                                          .statusChangeDialouge(
+                                            context,
+                                            'Completed',
+                                            data.id!,
+                                            data.customerNumber,
+                                            data.machineName,
+                                            false
+                                          );
+                                    }
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    padding: EdgeInsets.all(5),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: data.status == 'Pending'
+                                                ? Colors.red
+                                                : data.status == 'On proccess'
+                                                ? Colors.amber
+                                                : Colors.green,
+                                          ),
+                                          width: 10,
+                                          height: 10,
+                                        ),
+                                        SizedBox(width: 5),
+                                        Text(data.status),
+                                      ],
+                                    ),
                                   ),
-                                  height: 10,
-                                  width: 10,
                                 ),
-                                SizedBox(width: 5),
-                                Text(data.paymentStatus),
-                              
-                              ],
-                            ),
-                          ),
-                            SizedBox(width: 20),
+                                Spacer(),
+                                Container(
+                                  margin: EdgeInsets.symmetric(vertical: 8),
+                                  padding: EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: data.paymentStatus == 'Pending'
+                                              ? Colors.red
+                                              : Colors.green,
+                                        ),
+                                        height: 10,
+                                        width: 10,
+                                      ),
+                                      SizedBox(width: 5),
+                                      Text(data.paymentStatus),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(width: 20),
                                 data.paymentStatus == 'Pending'
                                     ? ElevatedButton(
                                         onPressed: () async {
@@ -246,68 +247,72 @@ class _MachineDetailPage extends ConsumerState<MachineDetailPage> {
                                       )
                                     : SizedBox(),
                                 SizedBox(width: 20),
-                        ],
-                      ):GestureDetector(
-                            onTap: () async {
-                              if (data.status == 'Pending') {
-                                await SimpleDialouges().statusChangeDialouge(
-                                  context,
-                                  'On proccess',
-                                  data.id!,
-                                  data.customerNumber,
-                                  data.machineName,
-                                );
-                              } else if (data.status == 'On proccess') {
-                                if (data.finalAmount == null) {
-                                  SimpleDialouges().finalAmountDialouge(
+                              ],
+                            )
+                          : GestureDetector(
+                              onTap: () async {
+                                if (data.status == 'Pending') {
+                                  await SimpleDialouges().statusChangeDialouge(
+                                    context,
+                                    'On proccess',
+                                    data.id!,
+                                    data.customerNumber,
+                                    data.machineName,
+                                    false
+                                  );
+                                } else if (data.status == 'On proccess') {
+                                  if (data.finalAmount == null) {
+                                    SimpleDialouges().finalAmountDialouge(
+                                      context,
+                                      'Completed',
+                                      data.id!,
+                                      false
+                                    );
+                                    return;
+                                  }
+                                  if (data.amountPaid == data.finalAmount) {
+                                    await FirebaseFirestore.instance
+                                        .collection('machines')
+                                        .doc(data.id)
+                                        .update({'paymentStatus': 'Completed'});
+                                  }
+                                  await SimpleDialouges().statusChangeDialouge(
                                     context,
                                     'Completed',
                                     data.id!,
+                                    data.customerNumber,
+                                    data.machineName,
+                                    false
                                   );
-                                  return;
                                 }
-                                if (data.amountPaid == data.finalAmount) {
-                                  await FirebaseFirestore.instance
-                                      .collection('machines')
-                                      .doc(data.id)
-                                      .update({'paymentStatus': 'Completed'});
-                                }
-                                await SimpleDialouges().statusChangeDialouge(
-                                  context,
-                                  'Completed',
-                                  data.id!,
-                                  data.customerNumber,
-                                  data.machineName,
-                                );
-                              }
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              padding: EdgeInsets.all(5),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: data.status == 'Pending'
-                                          ? Colors.red
-                                          : data.status == 'On proccess'
-                                          ? Colors.amber
-                                          : Colors.green,
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: EdgeInsets.all(5),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: data.status == 'Pending'
+                                            ? Colors.red
+                                            : data.status == 'On proccess'
+                                            ? Colors.amber
+                                            : Colors.green,
+                                      ),
+                                      width: 10,
+                                      height: 10,
                                     ),
-                                    width: 10,
-                                    height: 10,
-                                  ),
-                                  SizedBox(width: 5),
-                                  Text(data.status),
-                                ],
+                                    SizedBox(width: 5),
+                                    Text(data.status),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
                     ],
                   ),
                 ),

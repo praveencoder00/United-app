@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
          textTheme: GoogleFonts.robotoSlabTextTheme(),
       ),
-      home: InvoicePreviewPage(),
+      home: HomePage(),
     ); 
   }
 }

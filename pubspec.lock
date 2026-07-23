@@ -320,6 +320,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.8.0"
+  indian_currency_to_word:
+    dependency: "direct main"
+    description:
+      name: indian_currency_to_word
+      sha256: "341e2ff310b0dba129c74f2d8fbdf067c25e897f2c2df2484ac7cb4d63fe484c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   io:
     dependency: transitive
     description:

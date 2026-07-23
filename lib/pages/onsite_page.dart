@@ -7,27 +7,37 @@ import 'package:united_app/utils/dialouges/add_dialouge.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:united_app/utils/dialouges/onsite_add_dialouge.dart';
+import 'package:united_app/utils/dialouges/onsite_preview_dialouge.dart';
 import 'package:united_app/utils/dialouges/simple_dialouges.dart';
 
 
 
-class CompletedPage extends ConsumerWidget {
-  const CompletedPage({super.key});
+class OnsitePage extends ConsumerWidget {
+  const OnsitePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final machines = ref.watch(machinesProvider);
-    final selectedType = ref.watch(paymentStatusFilterProvider);
+    final machines = ref.watch(onSiteMachinesProvider);
+    final selectedType = ref.watch(onSiteStatusFilterProvider);
     final search = ref.watch(searchProvider).toLowerCase();
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-       appBar: AppBar(title: Text('Completed machines'),leading: GestureDetector(
+       appBar: AppBar(title: Text('Onsite machines'),leading: GestureDetector(
         onTap: () {
           ref.read(searchProvider.notifier).state = '';
           Navigator.pop(context);
         },
         child: Icon(Icons.arrow_back_ios_new_rounded)),),
+
+            floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await OnsiteAddDialouge().addDialogue(context);
+        },
+        backgroundColor: const Color.fromARGB(255, 236, 128, 255),
+        child: Icon(Icons.add, color: Colors.white),
+      ),
     
       body: machines.when(
         loading: () =>
@@ -38,10 +48,10 @@ class CompletedPage extends ConsumerWidget {
 
         data: (list) {
          final problemMachines = list.where((machine) {
-            if (machine.status != 'Completed') return false;
+
 
              // Apply type filter
-            if (selectedType != 'All' && machine.paymentStatus != selectedType) {
+            if (selectedType != 'All' && machine.status != selectedType) {
               return false;
             }
 
@@ -51,8 +61,7 @@ class CompletedPage extends ConsumerWidget {
             // Search in multiple fields
             return machine.customerName.toLowerCase().contains(search) ||
                 machine.customerNumber.toLowerCase().contains(search) ||
-                machine.machineName.toLowerCase().contains(search) ||
-                machine.machineId.toLowerCase().contains(search);
+                machine.address.toLowerCase().contains(search) ;
           }).toList();
               if (problemMachines.isEmpty) {
             return Column(
@@ -82,6 +91,7 @@ class CompletedPage extends ConsumerWidget {
                   children: [
                   _chip(ref, "All", selectedType),
                     _chip(ref, "Completed", selectedType),
+                     _chip(ref, "Seen", selectedType),
                     _chip(ref, "Pending", selectedType),
                   ],
                 ),
@@ -118,6 +128,7 @@ class CompletedPage extends ConsumerWidget {
                   children: [
                     _chip(ref, "All", selectedType),
                     _chip(ref, "Completed", selectedType),
+                    _chip(ref, "Seen", selectedType),
                     _chip(ref, "Pending", selectedType),
                   ],
                 ),
@@ -129,11 +140,9 @@ class CompletedPage extends ConsumerWidget {
                     final machine = problemMachines[index];
                 
                    return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => MachineDetailPage(initialIndex: 1,machineId: machine.id!,cusName: machine.customerName,machineName: machine.machineName,)),
-                    );
+                  onTap: ()async {
+                    await OnsitePreviewDialouge().addDialogue(context, machine);
+                    
                   },
                   onLongPress: () async => SimpleDialouges().deleteDialouge(context, machine.id!) ,
                   child: Container(
@@ -150,7 +159,7 @@ class CompletedPage extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(machine.customerName, style: TextStyle(fontSize: 24)),
-                        Text('${machine.machineName} -- id:${machine.machineId}', style: TextStyle(fontSize: 18)),
+                        Text(machine.address,  style: TextStyle(fontSize: 18)),
                         Text('${machine.date.day}-${machine.date.month}-${machine.date.year}'),
                         Row(
                           children: [
@@ -167,7 +176,7 @@ class CompletedPage extends ConsumerWidget {
                                   Container(
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: machine.status == 'Pending'? Colors.red: machine.status == 'On proccess'? Colors.amber:Colors.green,
+                                      color: machine.status == 'Pending'? Colors.red: machine.status == 'Seen'? Colors.amber:Colors.green,
                                     ),
                                     height: 10,
                                     width: 10,
@@ -177,30 +186,7 @@ class CompletedPage extends ConsumerWidget {
                                 ],
                               ),
                             ),
-                            Spacer(),
-                            Container(
-                              margin: EdgeInsets.symmetric(vertical: 8),
-                              padding: EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                border: Border.all(),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: machine.paymentStatus == 'Pending'? Colors.red: Colors.green,
-                                    ),
-                                    height: 10,
-                                    width: 10,
-                                  ),
-                                  SizedBox(width: 5),
-                                  Text(machine.paymentStatus),
-                                ],
-                              ),
-                            ),
+
                           ],
                         ),
                       ],
@@ -225,7 +211,7 @@ Widget _chip(WidgetRef ref, String type, String selected) {
       label: Text(type),
       selected: selected == type,
       onSelected: (_) {
-        ref.read(paymentStatusFilterProvider.notifier).state = type;
+        ref.read(onSiteStatusFilterProvider.notifier).state = type;
       },
     ),
   );

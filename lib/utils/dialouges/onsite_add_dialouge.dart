@@ -1,19 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:united_app/firebase/firebase_functions.dart';
+import 'package:united_app/models/finance_model.dart';
 import 'package:united_app/models/machine_model.dart';
+import 'package:united_app/models/onsite_model.dart';
 import 'package:united_app/providers/machine_providers.dart';
+import 'package:united_app/utils/dialouges/simple_dialouges.dart';
 
-class AddDialouge {
+class OnsiteAddDialouge {
   Future<void> addDialogue(BuildContext context) async {
     TextEditingController customerName = TextEditingController();
     TextEditingController customerNumber = TextEditingController();
-    TextEditingController machineName = TextEditingController();
+    TextEditingController address = TextEditingController();
     TextEditingController problem = TextEditingController();
-    TextEditingController estimatedAmount = TextEditingController();
-    String? selectedMachineType;
+
+    TextEditingController amountPaid = TextEditingController();
+
+    String? selectedStatus;
     bool isLoading = false;
-    List<String> machineTypes = ['Printer', 'Laptop', 'Desktop', 'Others'];
+
+    List<String> status = ['Pending', 'Completed'];
+
     final fromKey = GlobalKey<FormState>();
     String search = '';
 
@@ -28,33 +35,47 @@ class AddDialouge {
               });
             });
             Future<void> onTap() async {
-
               setState(() => isLoading = false);
 
               try {
-                final machineIdref = await FirebaseFirestore.instance
-                    .collection('utils')
-                    .doc('machineId')
-                    .get();
-                int machineId = machineIdref.data()!['id'];
-                await FirebaseFirestore.instance
-                    .collection('utils')
-                    .doc('machineId')
-                    .update({'id': FieldValue.increment(1)});
-                if (fromKey.currentState!.validate()) {
-                  Machine machineModel = Machine(
-                    machineName: machineName.text,
+                if (fromKey.currentState!.validate() &&
+                    selectedStatus != null) {
+                  OnsiteModel machineModel = OnsiteModel(
                     customerName: customerName.text,
-                    status: 'Pending',
+                    status: selectedStatus!,
                     customerNumber: customerNumber.text,
                     date: DateTime.now(),
-                    type: selectedMachineType!,
-                    estimatedAmount: int.parse(estimatedAmount.text),
-                    amountPaid: 0,
-                    machineId: 'M${machineId + 1}',
-                    paymentStatus: 'Pending',
+                    address: address.text,
+                    problem: problem.text,
+
+                    amountPaid: amountPaid.text.trim().isNotEmpty
+                        ? int.parse(amountPaid.text)
+                        : null,
                   );
-                  FirestoreService().addMachine(machineModel, problem.text);
+                  if (amountPaid.text.trim().isNotEmpty) {
+                   
+                    final now = DateTime.now();
+
+                    final finance = FinanceModel(
+                      id: '',
+                      amount: double.parse(amountPaid.text.trim()),
+                      note: '${customerName.text}--${problem.text}',
+                      type: 'income',
+                      createdAt: now,
+                      year: now.year,
+                      month: now.month,
+                      day: now.day,
+                    );
+                    await SimpleDialouges().addPaymentToFinance(
+                      context,
+                      finance,
+                    );
+                  }
+                   await FirestoreService().onSiteAddMachine(
+                      machineModel,
+                      problem.text,
+                    );
+
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Machine added successfully'),
@@ -124,7 +145,7 @@ class AddDialouge {
                           ),
                         ),
                         SizedBox(height: 20),
-                        StreamBuilder<List<Map<String,dynamic>>>(
+                        StreamBuilder<List<Map<String, dynamic>>>(
                           stream: FirestoreService().searchCustomers(search),
                           builder: (context, snapshot) {
                             if (!snapshot.hasData || search.isEmpty) {
@@ -152,8 +173,7 @@ class AddDialouge {
                                       customerNumber.text =
                                           customer['phoneNumber'];
 
-                                      customerName.text =
-                                          customer['name'];
+                                      customerName.text = customer['name'];
 
                                       FocusScope.of(context).unfocus();
 
@@ -189,7 +209,7 @@ class AddDialouge {
                         ),
                         SizedBox(height: 20),
                         TextFormField(
-                          controller: machineName,
+                          controller: address,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Enter the Machine name';
@@ -201,9 +221,9 @@ class AddDialouge {
                             border: OutlineInputBorder(),
                             label: Row(
                               children: [
-                                Icon(Icons.print_rounded),
+                                Icon(Icons.place_rounded),
                                 SizedBox(width: 10),
-                                Text('Machine Name'),
+                                Text('Address'),
                               ],
                             ),
                           ),
@@ -230,50 +250,31 @@ class AddDialouge {
                           ),
                         ),
                         SizedBox(height: 20),
-                        TextFormField(
-                          controller: estimatedAmount,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Enter the amount';
-                            } else {
-                              return null;
-                            }
-                          },
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            label: Row(
-                              children: [
-                                Icon(Icons.money),
-                                SizedBox(width: 10),
-                                Text('Estimated Amount'),
-                              ],
-                            ),
-                          ),
-                        ),
+                        selectedStatus == 'Completed'
+                            ? TextFormField(
+                                controller: amountPaid,
+                                // validator: (value) {
+                                //   if (value == null || value.isEmpty) {
+                                //     return 'Enter the amount';
+                                //   } else {
+                                //     return null;
+                                //   }
+                                // },
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  label: Row(
+                                    children: [
+                                      Icon(Icons.money),
+                                      SizedBox(width: 10),
+                                      Text('Paid Amount'),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : SizedBox(),
                         SizedBox(height: 20),
-                        // TextFormField(
-                        //   controller: estimatedAmount,
-                        //   validator: (value) {
-                        //     if (value == null || value.isEmpty) {
-                        //       return 'Enter the amount';
-                        //     } else {
-                        //       return null;
-                        //     }
-                        //   },
-                        //   keyboardType: TextInputType.number,
-                        //   decoration: InputDecoration(
-                        //     border: OutlineInputBorder(),
-                        //     label: Row(
-                        //       children: [
-                        //         Icon(Icons.money),
-                        //         SizedBox(width: 10),
-                        //         Text('initial Amount'),
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
-                        SizedBox(height: 20),
+
                         // dropdown list
                         DropdownButtonFormField<String>(
                           validator: (value) {
@@ -283,18 +284,17 @@ class AddDialouge {
                               return 'Select machine type';
                             }
                           },
-                          value: selectedMachineType,
-                          items: machineTypes
+                          value: selectedStatus,
+                          items: status
                               .map(
                                 (w) =>
                                     DropdownMenuItem(value: w, child: Text(w)),
                               )
                               .toList(),
-                          onChanged: (v) =>
-                              setState(() => selectedMachineType = v),
+                          onChanged: (v) => setState(() => selectedStatus = v),
                           decoration: InputDecoration(
-                            labelText: "Select Machine type",
-                            prefixIcon: Icon(Icons.print_rounded),
+                            labelText: "Select status type",
+                            prefixIcon: Icon(Icons.timer),
                             filled: true,
                             fillColor: Colors.grey[100],
                             border: OutlineInputBorder(

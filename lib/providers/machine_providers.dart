@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:united_app/firebase/firebase_functions.dart';
 import 'package:united_app/models/machine_model.dart';
+import 'package:united_app/models/onsite_model.dart';
 import 'package:united_app/models/problemLog_model.dart';
 
 final firestoreProvider =
@@ -16,6 +17,9 @@ final machineTypeFilterProvider =
 final paymentStatusFilterProvider =
     StateProvider<String>((ref) => 'All');
 
+final onSiteStatusFilterProvider =
+    StateProvider<String>((ref) => 'All');
+
 final searchProvider = StateProvider<String>((ref) => '');
 
 final machinesProvider =
@@ -23,6 +27,13 @@ final machinesProvider =
   return ref
       .watch(firestoreProvider)
       .getMachines();
+});
+
+final onSiteMachinesProvider =
+    StreamProvider<List<OnsiteModel>>((ref) {
+  return ref
+      .watch(firestoreProvider)
+      .getOnSiteMachines();
 });
 
 final machineProvider = StreamProvider.autoDispose.family<Machine,String>((ref,id){

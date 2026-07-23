@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:united_app/pages/completed_page.dart';
+import 'package:united_app/pages/finace_page.dart';
 import 'package:united_app/pages/machine_detail_page.dart';
 import 'package:united_app/pages/billwgst_page.dart';
+import 'package:united_app/pages/onsite_page.dart';
 import 'package:united_app/providers/machine_providers.dart';
 import 'package:united_app/utils/dialouges/add_dialouge.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:united_app/utils/dialouges/instant_add_dialouge.dart';
 import 'package:united_app/utils/dialouges/simple_dialouges.dart';
 
-class HomePage extends ConsumerStatefulWidget{
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
@@ -17,14 +20,11 @@ class HomePage extends ConsumerStatefulWidget{
 }
 
 class _HomePage extends ConsumerState<HomePage> {
-
   @override
   Widget build(BuildContext context) {
     final machines = ref.watch(machinesProvider);
     final selectedType = ref.watch(machineTypeFilterProvider);
     final search = ref.watch(searchProvider).toLowerCase();
-  
-
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -62,23 +62,24 @@ class _HomePage extends ConsumerState<HomePage> {
           if (problemMachines.isEmpty) {
             return Column(
               children: [
-                 Container(
-                margin: const EdgeInsets.all(10),
-                height: 50,
-                child: TextField(
-                  onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
-                  decoration: const InputDecoration(
-                    hintText: 'Search...',
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                Container(
+                  margin: const EdgeInsets.all(10),
+                  height: 50,
+                  child: TextField(
+                    onTapOutside: (_) =>
+                        FocusManager.instance.primaryFocus?.unfocus(),
+                    decoration: const InputDecoration(
+                      hintText: 'Search...',
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
                     ),
+                    onChanged: (value) {
+                      ref.read(searchProvider.notifier).state = value;
+                    },
                   ),
-                  onChanged: (value) {
-                    ref.read(searchProvider.notifier).state = value;
-                  },
                 ),
-              ),
                 SizedBox(
                   height: 50,
                   child: ListView(
@@ -104,7 +105,8 @@ class _HomePage extends ConsumerState<HomePage> {
                 margin: const EdgeInsets.all(10),
                 height: 50,
                 child: TextField(
-                  onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+                  onTapOutside: (_) =>
+                      FocusManager.instance.primaryFocus?.unfocus(),
                   decoration: const InputDecoration(
                     hintText: 'Search...',
                     prefixIcon: Icon(Icons.search),
@@ -145,6 +147,8 @@ class _HomePage extends ConsumerState<HomePage> {
                             builder: (_) => MachineDetailPage(
                               initialIndex: 0,
                               machineId: machine.id!,
+                              cusName: machine.customerName,
+                              machineName: machine.machineName,
                             ),
                           ),
                         );
@@ -155,7 +159,6 @@ class _HomePage extends ConsumerState<HomePage> {
                       ),
                       child: Container(
                         width: double.maxFinite,
-                        height: 150,
                         margin: EdgeInsets.all(10),
                         padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -256,7 +259,29 @@ class _HomePage extends ConsumerState<HomePage> {
               ),
               title: Text('Invoice with gst'),
             ),
-     
+            ListTile(
+              leading: Icon(Icons.note_add_sharp),
+              onTap: () async {
+                Navigator.pop(context);
+                await InstantAddDialouge().addDialogue(context);
+              },
+              title: Text('Instant entry'),
+            ),
+
+            ListTile(
+              leading: Icon(Icons.note_add_sharp),
+              onTap: () => Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (context) => FinancePage())),
+              title: Text('finance'),
+            ),
+                        ListTile(
+              leading: Icon(Icons.work_history),
+              onTap: () => Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (context) => OnsitePage())),
+              title: Text('On Site'),
+            ),
           ],
         ),
       ),

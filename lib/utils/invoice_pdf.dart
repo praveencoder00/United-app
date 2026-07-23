@@ -1,174 +1,255 @@
 import 'dart:typed_data';
 
+import 'package:indian_currency_to_word/indian_currency_to_word.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:united_app/pages/billwgst_page.dart';
 
 class InvoicePdf {
-  static Future<Uint8List> generate() async {
+  static Future<Uint8List> generate(
+    String name,
+    String address,
+    String date,
+    String invoiceNo,
+
+    List<ProductItem> products,
+  ) async {
     final pdf = pw.Document();
 
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(18),
-        build: (context) => [_invoice()],
+        build: (context) => [
+          _invoice(name, address, date, invoiceNo, products),
+        ],
       ),
     );
 
     return pdf.save();
   }
 
-  static pw.Widget _invoice() {
-    return pw.Column(children: [ pw.Container(
-      decoration: pw.BoxDecoration(border: pw.Border.all(width: 1)),
-      child: pw.Column(
-        children: [
-          //----------title---------------
-          pw.Container(
-            padding: const pw.EdgeInsets.all(5),
-            alignment: pw.Alignment.center,
-            child: pw.Text(
-              "Tax Invoice",
-              style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16),
-            ),
-          ),
-          //------------header-----------
-          pw.Row(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
+  static pw.Widget _invoice(
+    String name,
+    String address,
+    String date,
+    String invoiceNo,
+    List<ProductItem> products,
+  ) {
+    final converter = AmountToWords();
+    double totalAmount = 0;
+
+    for (final product in products) {
+      totalAmount += double.parse(product.quantity.text.trim()) * double.parse(product.amount.text.trim()) ;
+    }
+
+    final amountInWords = converter.convertAmountToWords(totalAmount);
+
+    return pw.Column(
+      children: [
+        pw.Container(
+          decoration: pw.BoxDecoration(border: pw.Border.all(width: 1)),
+          child: pw.Column(
             children: [
-              /// LEFT
-              pw.Expanded(
-                flex: 5,
-                child: pw.Container(
-                  height: 230,
-                  decoration: pw.BoxDecoration(
-                    border: pw.Border(
-                      top: pw.BorderSide(width: 1),
-                      left: pw.BorderSide(width: 1),
-                      right: pw.BorderSide(width: 1),
+              //----------title---------------
+              pw.Container(
+                padding: const pw.EdgeInsets.all(5),
+                alignment: pw.Alignment.center,
+                child: pw.Text(
+                  "Tax Invoice",
+                  style: pw.TextStyle(
+                    fontWeight: pw.FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              //------------header-----------
+              pw.Row(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  /// LEFT
+                  pw.Expanded(
+                    flex: 5,
+                    child: pw.Container(
+                      height: 230,
+                      decoration: pw.BoxDecoration(
+                        border: pw.Border(
+                          top: pw.BorderSide(width: 1),
+                          left: pw.BorderSide(width: 1),
+                          right: pw.BorderSide(width: 1),
+                        ),
+                      ),
+                      child: pw.Column(
+                        children: [
+                          pw.Container(
+                            alignment: pw.Alignment.topLeft,
+                            padding: const pw.EdgeInsets.all(4),
+                            child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Text(
+                                  "UNITED IT SOLUTIONS",
+                                  style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold,
+                                  ),
+                                ),
+                                pw.SizedBox(height: 5),
+
+                                pw.Text("No.115, New Jail Road"),
+                                pw.SizedBox(height: 5),
+
+                                pw.Text("Madurai-625016"),
+                                pw.SizedBox(height: 5),
+                                pw.Text("State Name : Tamil Nadu"),
+                                pw.SizedBox(height: 5),
+                                pw.Text(
+                                  "E-Mail : uniteditsolutions28@gmail.com",
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          pw.Divider(height: 1),
+
+                          pw.Container(
+                            alignment: pw.Alignment.centerLeft,
+                            padding: const pw.EdgeInsets.all(4),
+                            child: pw.Text(
+                              "Buyer (Bill to)",
+                              style: const pw.TextStyle(fontSize: 9),
+                            ),
+                          ),
+
+                          pw.Container(
+                            alignment: pw.Alignment.topLeft,
+                            padding: const pw.EdgeInsets.all(4),
+                            child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Text(
+                                  name,
+                                  style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold,
+                                  ),
+                                ),
+
+                                pw.Text(address),
+
+                                pw.SizedBox(height: 10),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  child: pw.Column(
-                    children: [
-                      pw.Container(
-                        alignment: pw.Alignment.topLeft,
-                        padding: const pw.EdgeInsets.all(4),
-                        child: pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.start,
-                          children: [
-                            pw.Text(
-                              "UNITED IT SOLUTIONS",
-                              style: pw.TextStyle(
-                                fontWeight: pw.FontWeight.bold,
-                              ),
-                            ),
-                            pw.SizedBox(height: 5),
 
-                            pw.Text("No.115, New Jail Road"),
-                             pw.SizedBox(height: 5),
-
-                            pw.Text("Madurai-625016"),
- pw.SizedBox(height: 5),
-                            pw.Text("State Name : Tamil Nadu"),
- pw.SizedBox(height: 5),
-                            pw.Text("E-Mail : uniteditsolutions28@gmail.com"),
-                          ],
-                        ),
+                  /// RIGHT
+                  pw.Expanded(
+                    flex: 4,
+                    child: pw.Container(
+                      height: 230,
+                      decoration: pw.BoxDecoration(
+                        border: pw.Border.all(width: 1),
                       ),
+                      child: pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          _detailRow("Invoice No.", invoiceNo, "Dated", date),
 
-                      pw.Divider(height: 1),
+                          _detailRow(
+                            'Delivery Note',
+                            '',
+                            'Mode/Terms of Payment',
+                            '',
+                          ),
 
-                      pw.Container(
-                        alignment: pw.Alignment.centerLeft,
-                        padding: const pw.EdgeInsets.all(4),
-                        child: pw.Text(
-                          "Buyer (Bill to)",
-                          style: const pw.TextStyle(fontSize: 9),
-                        ),
+                          _detailRow(
+                            "Reference No. & Date.",
+                            "",
+                            "Other References",
+                            "",
+                          ),
+
+                          _detailRow("Buyer's Order No.", "", "Dated", ""),
+
+                          _detailRow(
+                            "Dispatch Doc No.",
+                            "",
+                            "Delivery Note Date",
+                            "",
+                          ),
+
+                          _detailRow(
+                            "Dispatched through",
+                            "",
+                            "Destination",
+                            "",
+                          ),
+                          pw.Padding(
+                            padding: pw.EdgeInsets.all(2),
+                            child: pw.Text('Terms of Delivery'),
+                          ),
+
+                          // _detailRow("Terms of Delivery", ""),
+                        ],
                       ),
-
-                      pw.Container(
-                        alignment: pw.Alignment.topLeft,
-                        padding: const pw.EdgeInsets.all(4),
-                        child: pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.start,
-                          children: [
-                            pw.Text(
-                              "VTM LIMITED",
-                              style: pw.TextStyle(
-                                fontWeight: pw.FontWeight.bold,
-                              ),
-                            ),
-
-                            pw.Text("MADURAI"),
-
-                            pw.SizedBox(height: 10),
-
-                         
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
 
-              /// RIGHT
-              pw.Expanded(
-                flex: 4,
-                child: pw.Container(
-                  height: 230,
-                  decoration: pw.BoxDecoration(border: pw.Border.all(width: 1)),
-                  child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      _detailRow(
-                        "Invoice No.",
-                        "U99/26-27",
-                        "Dated",
-                        "15-Jul-26",
+              //-----------table------------
+              pw.Column(
+                children: [
+                  pw.Container(
+                    decoration: pw.BoxDecoration(
+                      border: pw.Border(
+                        left: pw.BorderSide(width: 1),
+                        right: pw.BorderSide(width: 1),
+                        bottom: pw.BorderSide(width: 1),
                       ),
+                    ),
+                    child: pw.Row(
+                      mainAxisSize: pw.MainAxisSize.max,
+                      children: [
+                        _headCell("SI", 30),
 
-                      _detailRow(
-                        'Delivery Note',
-                        '',
-                        'Mode/Terms of Payment',
-                        '',
-                      ),
+                        _headCell("Description of Goods", 200),
 
-                      _detailRow(
-                        "Reference No. & Date.",
-                        "",
-                        "Other References",
-                        "",
-                      ),
+                        _headCell("Quantity", 70),
 
-                      _detailRow("Buyer's Order No.", "", "Dated", ""),
+                        _headCell("Rate", 80),
 
-                      _detailRow(
-                        "Dispatch Doc No.",
-                        "",
-                        "Delivery Note Date",
-                        "",
-                      ),
-
-                      _detailRow("Dispatched through", "", "Destination", ""),
-                      pw.Padding(
-                        padding: pw.EdgeInsets.all(2),
-                        child: pw.Text('Terms of Delivery'),
-                      ),
-
-                      // _detailRow("Terms of Delivery", ""),
-                    ],
+                        _headCell(" Amount", double.maxFinite),
+                      ],
+                    ),
                   ),
-                ),
-              ),
-            ],
-          ),
 
-          //-----------table------------
-          pw.Column(
-            children: [
+                  ...List.generate(products.length, (index) {
+                    final item = products[index];
+                    int tot =
+                        int.parse(item.amount.text) *
+                        int.parse(item.quantity.text);
+
+                    return _itemRow(
+                      (index + 1).toString(),
+                      item.name.text,
+                      item.quantity.text,
+                      item.amount.text,
+                      '$tot',
+                    );
+                  }),
+
+                  ...List.generate(
+                    (4 - products.length).clamp(0, 4),
+                    (_) => _emptyItemRow(),
+                  ),
+                ],
+              ),
+
+              //-------------bottom part ---------------
+              //total
               pw.Container(
                 decoration: pw.BoxDecoration(
                   border: pw.Border(
@@ -177,329 +258,153 @@ class InvoicePdf {
                     bottom: pw.BorderSide(width: 1),
                   ),
                 ),
-                child: pw.Row(
+                child: pw.Column(
                   children: [
-                    _headCell("SI", 30),
+                    pw.Container(
+                      height: 26,
+                      child: pw.Row(
+                        children: [
+                          pw.Expanded(
+                            child: pw.Padding(
+                              padding: const pw.EdgeInsets.only(left: 5),
+                              child: pw.Text(
+                                "Total",
+                                style: pw.TextStyle(
+                                  fontWeight: pw.FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
 
-                    _headCell("Description of Goods", 180),
+                          pw.Container(
+                            width: 120,
+                            alignment: pw.Alignment.centerRight,
+                            padding: const pw.EdgeInsets.only(right: 5),
+                            child: pw.Text(
+                              '$totalAmount',
+                              style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              //amount in words
+              pw.Container(
+                width: double.infinity,
+                padding: const pw.EdgeInsets.all(6),
+                decoration: pw.BoxDecoration(
+                  border: pw.Border(
+                    left: pw.BorderSide(width: 1),
+                    right: pw.BorderSide(width: 1),
+                    bottom: pw.BorderSide(width: 1),
+                  ),
+                ),
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      "Amount Chargeable (in words)",
+                      style: const pw.TextStyle(fontSize: 8),
+                    ),
 
+                    pw.SizedBox(height: 3),
 
-
-                    _headCell("Quantity", 50),
-
-                    _headCell("Rate", 65),
-
-
-
-                    _headCell("Amount", 45),
+                    pw.Text(
+                      amountInWords,
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
                   ],
                 ),
               ),
 
-              _itemRow(
-                "1",
-                "Dell Optiplex 3080 Desktop",
+              //bank details
+              pw.Container(
+                decoration: pw.BoxDecoration(border: pw.Border.all(width: 1)),
+                child: pw.Row(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Expanded(
+                      child: pw.Padding(
+                        padding: const pw.EdgeInsets.all(6),
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Text(
+                              "Company's Bank Details",
+                              style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                              ),
+                            ),
 
-                "1",
-                "18,000.00",
-                "18,000.00",
-              ),
+                            pw.SizedBox(height: 5),
 
-              
-              _emptyItemRow(),
-              _emptyItemRow(),
-              _emptyItemRow(),
-            ],
-          ),
+                            pw.Text("Bank :KARUR VYSYA BANK"),
 
-          //-------------bottom part ---------------
-          //total
-          pw.Container(
-            decoration: pw.BoxDecoration(
-              border: pw.Border(
-                left: pw.BorderSide(width: 1),
-                right: pw.BorderSide(width: 1),
-                bottom: pw.BorderSide(width: 1),
-              ),
-            ),
-            child: pw.Column(
-              children: [
-                _totalRow("Output CGST @9%", "1,372.88"),
+                            pw.Text("A/c No :1767115000003732"),
 
-                _totalRow("Output SGST @9%", "1,372.88"),
+                            pw.Text(
+                              "Branch & IFSC :MADURAI NORTH & KVBL0001767",
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
 
-                _totalRow("Round Off", "0.00"),
-
-                pw.Container(
-                  height: 26,
-                  child: pw.Row(
-                    children: [
-                      pw.Expanded(
-                        child: pw.Padding(
-                          padding: const pw.EdgeInsets.only(left: 5),
-                          child: pw.Text(
-                            "Total",
+                    pw.Container(
+                      width: 220,
+                      padding: const pw.EdgeInsets.all(6),
+                      child: pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text(
+                            "Declaration",
                             style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                           ),
-                        ),
+
+                          pw.SizedBox(height: 5),
+
+                          pw.Text(
+                            "We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.",
+                            style: const pw.TextStyle(fontSize: 8),
+                          ),
+
+                          pw.SizedBox(height: 35),
+
+                          pw.Align(
+                            alignment: pw.Alignment.centerRight,
+                            child: pw.Text(
+                              "Authorised Signatory",
+                              style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-
-                      pw.Container(
-                        width: 120,
-                        alignment: pw.Alignment.centerRight,
-                        padding: const pw.EdgeInsets.only(right: 5),
-                        child: pw.Text(
-                          "18,000.00 rs",
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          //amount in words
-          pw.Container(
-            width: double.infinity,
-            padding: const pw.EdgeInsets.all(6),
-            decoration: pw.BoxDecoration(
-              border: pw.Border(
-                left: pw.BorderSide(width: 1),
-                right: pw.BorderSide(width: 1),
-                bottom: pw.BorderSide(width: 1),
-              ),
-            ),
-            child: pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Text(
-                  "Amount Chargeable (in words)",
-                  style: const pw.TextStyle(fontSize: 8),
-                ),
-
-                pw.SizedBox(height: 3),
-
-                pw.Text(
-                  "INR Eighteen Thousand Only",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
-
-          //tax table
-          pw.Container(
-            decoration: pw.BoxDecoration(border: pw.Border.all(width: 1)),
-            child: pw.Column(
-              children: [
-                pw.Container(
-                  height: 24,
-                  alignment: pw.Alignment.center,
-                  child: pw.Text(
-                    "Tax Summary",
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-
-                pw.Table(
-                  border: pw.TableBorder.all(),
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        _taxHead("HSN/SAC"),
-
-                        _taxHead("Taxable"),
-
-                        _taxHead("CGST"),
-
-                        _taxHead("SGST"),
-
-                        _taxHead("Total Tax"),
-                      ],
-                    ),
-
-                    pw.TableRow(
-                      children: [
-                        _taxCell("8471"),
-
-                        _taxCell("15,254.24"),
-
-                        _taxCell("1,372.88"),
-
-                        _taxCell("1,372.88"),
-
-                        _taxCell("2,745.76"),
-                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          pw.Container(
-            alignment: pw.Alignment.centerLeft,
-            margin: pw.EdgeInsets.only(left: 4),
-            child:   pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Text(
-                  "Amount Chargeable (in words)",
-                  style: const pw.TextStyle(fontSize: 8),
-                ),
-
-                pw.SizedBox(height: 3),
-
-                pw.Text(
-                  "INR Two Thousand Seven Hundred And Fourty Five Rupees and Seventy Six Paise Only",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
-        
-          //bank details
-          pw.Container(
-    decoration: pw.BoxDecoration(
-      border: pw.Border.all(width: 1),
-    ),
-    child: pw.Row(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-
-        pw.Expanded(
-          child: pw.Padding(
-            padding: const pw.EdgeInsets.all(6),
-            child: pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-
-                pw.Text(
-                  "Company's Bank Details",
-                  style: pw.TextStyle(
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
-
-                pw.SizedBox(height: 5),
-
-                pw.Text("Bank :KARUR VYSYA BANK"),
-
-                pw.Text("A/c No :1767115000003732"),
-
-                pw.Text("Branch & IFSC :MADURAI NORTH & KVBL0001767"),
-
-              ],
-            ),
-          ),
-        ),
-
-        pw.Container(
-          width: 220,
-          padding: const pw.EdgeInsets.all(6),
-          child: pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-
-              pw.Text(
-                "Declaration",
-                style: pw.TextStyle(
-                  fontWeight: pw.FontWeight.bold,
-                ),
               ),
 
-              pw.SizedBox(height: 5),
-
-              pw.Text(
-                "We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.",
-                style: const pw.TextStyle(fontSize: 8),
-              ),
-
-              pw.SizedBox(height: 35),
-
-              pw.Align(
-                alignment: pw.Alignment.centerRight,
-                child: pw.Text(
-                  "Authorised Signatory",
-                  style: pw.TextStyle(
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
-              )
-
+              //----------footer-------
             ],
           ),
-        )
-
+        ),
+        pw.Container(
+          width: double.infinity,
+          alignment: pw.Alignment.center,
+          padding: const pw.EdgeInsets.all(5),
+          child: pw.Text(
+            "This is a Computer Generated Invoice",
+            style: const pw.TextStyle(fontSize: 8),
+          ),
+        ),
       ],
-    ),
-  ),
-  //----------footer-------
- 
-
-          
-        ],
-      ),
-    ),
-     pw.Container(
-    width: double.infinity,
-    alignment: pw.Alignment.center,
-    padding: const pw.EdgeInsets.all(5),
-    child: pw.Text(
-      "This is a Computer Generated Invoice",
-      style: const pw.TextStyle(
-        fontSize: 8,
-      ),
-    ),
-  )
-    ]);
-  }
-
-  static pw.Widget _taxHead(String text) {
-    return pw.Padding(
-      padding: const pw.EdgeInsets.all(4),
-      child: pw.Text(
-        text,
-        textAlign: pw.TextAlign.center,
-        style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8),
-      ),
-    );
-  }
-
-  static pw.Widget _taxCell(String text) {
-    return pw.Padding(
-      padding: const pw.EdgeInsets.all(4),
-      child: pw.Text(
-        text,
-        textAlign: pw.TextAlign.center,
-        style: const pw.TextStyle(fontSize: 8),
-      ),
-    );
-  }
-
-  static pw.Widget _totalRow(String title, String value) {
-    return pw.Container(
-      height: 22,
-      decoration: pw.BoxDecoration(
-        border: pw.Border(bottom: pw.BorderSide(width: 1)),
-      ),
-      child: pw.Row(
-        children: [
-          pw.Expanded(
-            child: pw.Padding(
-              padding: const pw.EdgeInsets.only(left: 5),
-              child: pw.Text(title),
-            ),
-          ),
-
-          pw.Container(
-            width: 120,
-            alignment: pw.Alignment.centerRight,
-            padding: const pw.EdgeInsets.only(right: 5),
-            child: pw.Text(value),
-          ),
-        ],
-      ),
     );
   }
 
@@ -523,14 +428,13 @@ class InvoicePdf {
         children: [
           _cell(sl, 30),
 
-          _cell(description, 180, alignment: pw.Alignment.topLeft),
+          _cell(description, 200, alignment: pw.Alignment.topLeft),
 
-          _cell(qty, 50),
+          _cell(qty, 70),
 
-          _cell(inclRate, 65, alignment: pw.Alignment.centerRight),
+          _cell(inclRate, 80, alignment: pw.Alignment.centerRight),
 
-
-          _cell(amount, 45, alignment: pw.Alignment.centerRight),
+          _cell(amount, double.maxFinite, alignment: pw.Alignment.centerLeft),
         ],
       ),
     );
@@ -555,7 +459,7 @@ class InvoicePdf {
   }
 
   static pw.Widget _emptyItemRow() {
-    return _itemRow("", "", "", "", "", );
+    return _itemRow("", "", "", "", "");
   }
 
   static pw.Widget _headCell(String text, double width) {

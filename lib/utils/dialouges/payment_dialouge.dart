@@ -1,10 +1,18 @@
-
 import 'package:flutter/material.dart';
 import 'package:united_app/firebase/firebase_functions.dart';
+import 'package:united_app/models/finance_model.dart';
 import 'package:united_app/models/problemLog_model.dart';
+import 'package:united_app/utils/dialouges/simple_dialouges.dart';
 
 class PaymentDialouge {
-    Future<void> addPaymentDialogue(BuildContext context, String docId, int amountPaid,int? finalAmount) async {
+  Future<void> addPaymentDialogue(
+    BuildContext context,
+    String docId,
+    int amountPaid,
+    int? finalAmount,
+    String cusName,
+    String machineName,
+  ) async {
     TextEditingController paymentContoller = TextEditingController();
     TextEditingController amount = TextEditingController();
     bool isLoading = false;
@@ -75,7 +83,7 @@ class PaymentDialouge {
                           ),
                           SizedBox(width: 10),
                           ElevatedButton(
-                          onPressed: () async {
+                            onPressed: () async {
                               if (formKey.currentState!.validate()) {
                                 setState(() {
                                   isLoading = true;
@@ -87,12 +95,27 @@ class PaymentDialouge {
                                     date: DateTime.now(),
                                   );
 
-                                  FirestoreService().addPaymentLog(
+                                  await FirestoreService().addPaymentLog(
                                     docId,
                                     problem,
                                     amountPaid,
-                                    finalAmount
+                                    finalAmount,
+                                  );
+                                  final now = DateTime.now();
 
+                                  final finance = FinanceModel(
+                                    id: '',
+                                    amount: double.parse(amount.text.trim()),
+                                    note: '$cusName--$machineName',
+                                    type: 'income',
+                                    createdAt: now,
+                                    year: now.year,
+                                    month: now.month,
+                                    day: now.day,
+                                  );
+                                  await SimpleDialouges().addPaymentToFinance(
+                                    context,
+                                    finance,
                                   );
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
