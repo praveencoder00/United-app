@@ -135,6 +135,37 @@ class SimpleDialouges {
     );
   }
 
+    Future<void> deleteOnSiteDialouge(
+    BuildContext context,
+    String id,
+  ) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Entry'),
+          content: Text('Are you sure want to Delete the entry?'),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await FirestoreService().deleteOnsite(id);
+                Navigator.of(context).pop();
+              },
+              child: Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> addPaymentToFinance(
     BuildContext context,
     FinanceModel finance,

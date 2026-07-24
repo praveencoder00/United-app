@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:united_app/pages/customer_worklog_page.dart';
 import 'package:united_app/pages/invoice_preview_page.dart';
@@ -10,6 +11,7 @@ class BillwgstPage extends StatefulWidget {
 }
 
 class _BillwgstPage extends State<BillwgstPage> {
+  DateTime now = DateTime.now();
   TextEditingController name = TextEditingController();
   TextEditingController address = TextEditingController();
   TextEditingController date = TextEditingController();
@@ -19,6 +21,36 @@ class _BillwgstPage extends State<BillwgstPage> {
   TextEditingController amount = TextEditingController();
   final fromKey = GlobalKey<FormState>();
   final List<ProductItem> products = [ProductItem()];
+
+  @override
+void initState() {
+  super.initState();
+
+  // Today's date in dd-MM-yyyy format
+  date.text ='${now.day}-${now.month}-${now.year}';
+
+  // Load invoice number from Firestore
+  loadInvoiceNumber();
+}
+
+Future<void> loadInvoiceNumber() async {
+  final ref = FirebaseFirestore.instance
+      .collection('utils')
+      .doc('invoiceNo');
+
+  final doc = await ref.get();
+
+  if (doc.exists) {
+    final current = doc['number'] as int;
+    invoiceNo.text = (current + 1).toString();
+    await FirebaseFirestore.instance
+    .collection('utils')
+    .doc('invoiceNo')
+    .update({
+  'number': int.parse(invoiceNo.text),
+});
+  }
+}
 
   @override
   Widget build(BuildContext context) {

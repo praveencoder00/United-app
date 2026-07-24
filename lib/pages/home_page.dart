@@ -257,7 +257,7 @@ class _HomePage extends ConsumerState<HomePage> {
                 context,
                 MaterialPageRoute(builder: (_) => BillwgstPage()),
               ),
-              title: Text('Invoice with gst'),
+              title: Text('Invoice'),
             ),
             ListTile(
               leading: Icon(Icons.note_add_sharp),

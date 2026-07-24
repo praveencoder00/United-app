@@ -43,7 +43,7 @@ class InvoicePdf {
       totalAmount += double.parse(product.quantity.text.trim()) * double.parse(product.amount.text.trim()) ;
     }
 
-    final amountInWords = converter.convertAmountToWords(totalAmount);
+    final amountInWords = '${converter.convertAmountToWords(totalAmount)} only';
 
     return pw.Column(
       children: [
@@ -328,35 +328,10 @@ class InvoicePdf {
                 child: pw.Row(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Expanded(
-                      child: pw.Padding(
-                        padding: const pw.EdgeInsets.all(6),
-                        child: pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.start,
-                          children: [
-                            pw.Text(
-                              "Company's Bank Details",
-                              style: pw.TextStyle(
-                                fontWeight: pw.FontWeight.bold,
-                              ),
-                            ),
-
-                            pw.SizedBox(height: 5),
-
-                            pw.Text("Bank :KARUR VYSYA BANK"),
-
-                            pw.Text("A/c No :1767115000003732"),
-
-                            pw.Text(
-                              "Branch & IFSC :MADURAI NORTH & KVBL0001767",
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    
 
                     pw.Container(
-                      width: 220,
+                      width: 560,
                       padding: const pw.EdgeInsets.all(6),
                       child: pw.Column(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,

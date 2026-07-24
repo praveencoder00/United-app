@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import 'package:united_app/pages/billwgst_page.dart';
@@ -22,7 +23,7 @@ class _InvoicePreviewPageState extends State<InvoicePreviewPage> {
   Widget build(BuildContext context) {
  return Scaffold(
   appBar: AppBar(title: const Text("Invoice Preview")),
-  body: InteractiveViewer(
+  body: defaultTargetPlatform == TargetPlatform.android? InteractiveViewer(
     minScale: 0.5,
     maxScale: 5,
     child: PdfPreview(
@@ -38,7 +39,19 @@ class _InvoicePreviewPageState extends State<InvoicePreviewPage> {
       canChangeOrientation: false,
       canDebug: false,
     ),
-  ),
+  ): PdfPreview(
+      build: (format) => InvoicePdf.generate(
+         widget.name,
+            widget.address,
+            widget.date,
+            widget.invoiceNo,
+            widget.products
+
+      ),
+      canChangePageFormat: false,
+      canChangeOrientation: false,
+      canDebug: false,
+    ),
 );
 
   }

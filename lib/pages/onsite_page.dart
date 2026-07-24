@@ -144,7 +144,7 @@ class OnsitePage extends ConsumerWidget {
                     await OnsitePreviewDialouge().addDialogue(context, machine);
                     
                   },
-                  onLongPress: () async => SimpleDialouges().deleteDialouge(context, machine.id!) ,
+                  onLongPress: () async => SimpleDialouges().deleteOnSiteDialouge(context, machine.id!) ,
                   child: Container(
                     width: double.maxFinite,
                     margin: EdgeInsets.all(10),

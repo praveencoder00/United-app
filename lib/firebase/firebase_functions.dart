@@ -418,5 +418,8 @@ Stream<List<int>> getDays(
               .toList();
         });
   }
+  Future<void> deleteOnsite(String id)async{
+    await _firestore.collection('onsite').doc(id).delete();
+  }
 
 }
