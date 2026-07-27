@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:indian_currency_to_word/indian_currency_to_word.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -16,7 +17,7 @@ class InvoicePdf {
   ) async {
     final pdf = pw.Document();
 
-    pdf.addPage(
+     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(18),
@@ -25,6 +26,18 @@ class InvoicePdf {
         ],
       ),
     );
+        final ref = FirebaseFirestore.instance.collection('utils').doc('invoiceNo');
+
+    final doc = await ref.get();
+
+    if (doc.exists) {
+      
+      
+      await FirebaseFirestore.instance
+          .collection('utils')
+          .doc('invoiceNo')
+          .update({'number': int.parse(invoiceNo)});
+    }
 
     return pdf.save();
   }
@@ -88,7 +101,7 @@ class InvoicePdf {
                               crossAxisAlignment: pw.CrossAxisAlignment.start,
                               children: [
                                 pw.Text(
-                                  "UNITED IT SOLUTIONS",
+                                  "UNITED IT SERVICES",
                                   style: pw.TextStyle(
                                     fontWeight: pw.FontWeight.bold,
                                   ),

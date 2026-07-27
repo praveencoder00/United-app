@@ -7,6 +7,7 @@ import 'package:united_app/firebase/firebase_functions.dart';
 import 'package:united_app/models/machine_model.dart';
 import 'package:united_app/models/onsite_model.dart';
 import 'package:united_app/models/problemLog_model.dart';
+import 'package:united_app/models/sales_model.dart';
 
 final firestoreProvider =
     Provider((ref) => FirestoreService());
@@ -27,6 +28,11 @@ final machinesProvider =
   return ref
       .watch(firestoreProvider)
       .getMachines();
+});
+
+final salesProvider =
+    StreamProvider<List<Sales>>((ref) {
+  return ref.watch(firestoreProvider).getSales();
 });
 
 final onSiteMachinesProvider =

@@ -4,22 +4,22 @@ import 'package:united_app/firebase/firebase_functions.dart';
 import 'package:united_app/models/finance_model.dart';
 import 'package:united_app/models/machine_model.dart';
 import 'package:united_app/models/onsite_model.dart';
+import 'package:united_app/models/sales_model.dart';
 import 'package:united_app/providers/machine_providers.dart';
 import 'package:united_app/utils/dialouges/simple_dialouges.dart';
 
-class OnsiteAddDialouge {
+class SalesDialouge {
   Future<void> addDialogue(BuildContext context) async {
     TextEditingController customerName = TextEditingController();
     TextEditingController customerNumber = TextEditingController();
-    TextEditingController address = TextEditingController();
-    TextEditingController problem = TextEditingController();
+    TextEditingController product = TextEditingController();
+    TextEditingController amount = TextEditingController();
 
-    TextEditingController amountPaid = TextEditingController();
+   
 
-    String? selectedStatus;
+
     bool isLoading = false;
 
-    List<String> status = ['Pending', 'Completed'];
 
     final fromKey = GlobalKey<FormState>();
     String search = '';
@@ -35,31 +35,27 @@ class OnsiteAddDialouge {
               });
             });
             Future<void> onTap() async {
-              setState(() => isLoading = false);
+              setState(() => isLoading = true);
 
               try {
-                if (fromKey.currentState!.validate() &&
-                    selectedStatus != null) {
-                  OnsiteModel machineModel = OnsiteModel(
+                if (fromKey.currentState!.validate() 
+                   ) {
+                  Sales machineModel = Sales(
                     customerName: customerName.text,
-                    status: selectedStatus!,
+                    amount: int.parse(amount.text) ,
+                    productName: product.text,
                     customerNumber: customerNumber.text,
                     date: DateTime.now(),
-                    address: address.text,
-                    problem: problem.text,
-
-                    amountPaid: amountPaid.text.trim().isNotEmpty
-                        ? int.parse(amountPaid.text)
-                        : null,
+                   
                   );
-                  if (amountPaid.text.trim().isNotEmpty) {
+                 
                    
                     final now = DateTime.now();
 
                     final finance = FinanceModel(
                       id: '',
-                      amount: double.parse(amountPaid.text.trim()),
-                      note: '${customerName.text}--${problem.text}',
+                      amount: double.parse(amount.text.trim()),
+                      note: '${customerName.text}--${product.text}',
                       type: 'income',
                       createdAt: now,
                       year: now.year,
@@ -70,15 +66,15 @@ class OnsiteAddDialouge {
                       context,
                       finance,
                     );
-                  }
-                   await FirestoreService().onSiteAddMachine(
+                  
+                   await FirestoreService().addSale(
                       machineModel,
-                      problem.text,
+            
                     );
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Machine added successfully'),
+                      content: Text('Product added successfully'),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -209,10 +205,10 @@ class OnsiteAddDialouge {
                         ),
                         SizedBox(height: 20),
                         TextFormField(
-                          controller: address,
+                          controller: product,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Enter the Address';
+                              return 'Enter the Product name';
                             } else {
                               return null;
                             }
@@ -221,19 +217,19 @@ class OnsiteAddDialouge {
                             border: OutlineInputBorder(),
                             label: Row(
                               children: [
-                                Icon(Icons.place_rounded),
+                                Icon(Icons.shopify_rounded),
                                 SizedBox(width: 10),
-                                Text('Address'),
+                                Text('Product'),
                               ],
                             ),
                           ),
                         ),
                         SizedBox(height: 20),
                         TextFormField(
-                          controller: problem,
+                          controller: amount,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Enter the problem';
+                              return 'Enter the Amount';
                             } else {
                               return null;
                             }
@@ -242,66 +238,15 @@ class OnsiteAddDialouge {
                             border: OutlineInputBorder(),
                             label: Row(
                               children: [
-                                Icon(Icons.report_problem_rounded),
+                                Icon(Icons.money),
                                 SizedBox(width: 10),
-                                Text('Problem'),
+                                Text('Amount'),
                               ],
                             ),
                           ),
                         ),
                         SizedBox(height: 20),
-                        selectedStatus == 'Completed'
-                            ? TextFormField(
-                                controller: amountPaid,
-                                // validator: (value) {
-                                //   if (value == null || value.isEmpty) {
-                                //     return 'Enter the amount';
-                                //   } else {
-                                //     return null;
-                                //   }
-                                // },
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  label: Row(
-                                    children: [
-                                      Icon(Icons.money),
-                                      SizedBox(width: 10),
-                                      Text('Paid Amount'),
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : SizedBox(),
-                        SizedBox(height: 20),
-
-                        // dropdown list
-                        DropdownButtonFormField<String>(
-                          validator: (value) {
-                            if (value != null && value.isNotEmpty) {
-                              return null;
-                            } else {
-                              return 'Select machine type';
-                            }
-                          },
-                          value: selectedStatus,
-                          items: status
-                              .map(
-                                (w) =>
-                                    DropdownMenuItem(value: w, child: Text(w)),
-                              )
-                              .toList(),
-                          onChanged: (v) => setState(() => selectedStatus = v),
-                          decoration: InputDecoration(
-                            labelText: "Select status type",
-                            prefixIcon: Icon(Icons.timer),
-                            filled: true,
-                            fillColor: Colors.grey[100],
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
+                      
                         const SizedBox(height: 20),
                         Align(
                           alignment: AlignmentGeometry.bottomRight,

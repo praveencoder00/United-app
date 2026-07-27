@@ -3,6 +3,7 @@ import 'package:united_app/models/finance_model.dart';
 import 'package:united_app/models/machine_model.dart';
 import 'package:united_app/models/onsite_model.dart';
 import 'package:united_app/models/problemLog_model.dart';
+import 'package:united_app/models/sales_model.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -420,6 +421,30 @@ Stream<List<int>> getDays(
   }
   Future<void> deleteOnsite(String id)async{
     await _firestore.collection('onsite').doc(id).delete();
+  }
+
+
+//-----------------sales--------------
+
+Future<void> addSale(Sales sale) async {
+  await _firestore
+      .collection('sales')
+      .add(sale.toMap());
+}
+
+Stream<List<Sales>> getSales() {
+  return _firestore
+      .collection('sales')
+      .orderBy('date', descending: true)
+      .snapshots()
+      .map(
+        (snapshot) => snapshot.docs
+            .map((doc) => Sales.fromMap(doc.id, doc.data()))
+            .toList(),
+      );
+}
+  Future<void> deleteSales(String id)async{
+    await _firestore.collection('sales').doc(id).delete();
   }
 
 }

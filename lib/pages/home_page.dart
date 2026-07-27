@@ -4,6 +4,7 @@ import 'package:united_app/pages/finace_page.dart';
 import 'package:united_app/pages/machine_detail_page.dart';
 import 'package:united_app/pages/billwgst_page.dart';
 import 'package:united_app/pages/onsite_page.dart';
+import 'package:united_app/pages/sales_page.dart';
 import 'package:united_app/providers/machine_providers.dart';
 import 'package:united_app/utils/dialouges/add_dialouge.dart';
 
@@ -94,7 +95,7 @@ class _HomePage extends ConsumerState<HomePage> {
                     ],
                   ),
                 ),
-                Expanded(child: Center(child: Text('No machines registered'))),
+                Expanded(child: Center(child: Text('No Products registered'))),
               ],
             );
           }
@@ -281,6 +282,13 @@ class _HomePage extends ConsumerState<HomePage> {
                 context,
               ).push(MaterialPageRoute(builder: (context) => OnsitePage())),
               title: Text('On Site'),
+            ),
+             ListTile(
+              leading: Icon(Icons.production_quantity_limits_outlined),
+              onTap: () => Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (context) => SalesPage())),
+              title: Text('Sales'),
             ),
           ],
         ),

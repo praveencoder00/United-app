@@ -23,34 +23,26 @@ class _BillwgstPage extends State<BillwgstPage> {
   final List<ProductItem> products = [ProductItem()];
 
   @override
-void initState() {
-  super.initState();
+  void initState() {
+    super.initState();
 
-  // Today's date in dd-MM-yyyy format
-  date.text ='${now.day}-${now.month}-${now.year}';
+    // Today's date in dd-MM-yyyy format
+    date.text = '${now.day}-${now.month}-${now.year}';
 
-  // Load invoice number from Firestore
-  loadInvoiceNumber();
-}
-
-Future<void> loadInvoiceNumber() async {
-  final ref = FirebaseFirestore.instance
-      .collection('utils')
-      .doc('invoiceNo');
-
-  final doc = await ref.get();
-
-  if (doc.exists) {
-    final current = doc['number'] as int;
-    invoiceNo.text = (current + 1).toString();
-    await FirebaseFirestore.instance
-    .collection('utils')
-    .doc('invoiceNo')
-    .update({
-  'number': int.parse(invoiceNo.text),
-});
+    // Load invoice number from Firestore
+    loadInvoiceNumber();
   }
-}
+
+  Future<void> loadInvoiceNumber() async {
+    final ref = FirebaseFirestore.instance.collection('utils').doc('invoiceNo');
+
+    final doc = await ref.get();
+
+    if (doc.exists) {
+      final current = doc['number'] as int;
+      invoiceNo.text = (current + 1).toString();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +132,7 @@ Future<void> loadInvoiceNumber() async {
                       child: TextFormField(
                         controller: invoiceNo,
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
+                          if (value == null || value.isEmpty ) {
                             return 'Enter the invoice no';
                           } else {
                             return null;
@@ -176,12 +168,12 @@ Future<void> loadInvoiceNumber() async {
                         children: [
                           TextFormField(
                             validator: (value) {
-                                                    if (value == null || value.isEmpty) {
-                                                      return 'Enter the Name';
-                                                    } else {
-                                                      return null;
-                                                    }
-                                                  },
+                              if (value == null || value.isEmpty) {
+                                return 'Enter the Name';
+                              } else {
+                                return null;
+                              }
+                            },
                             controller: item.name,
                             decoration: const InputDecoration(
                               labelText: "Name of Goods",
@@ -193,15 +185,15 @@ Future<void> loadInvoiceNumber() async {
 
                           Row(
                             children: [
-                             Expanded(
+                              Expanded(
                                 child: TextFormField(
                                   validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Enter the Quantity';
-                          } else {
-                            return null;
-                          }
-                        },
+                                    if (value == null || value.isEmpty) {
+                                      return 'Enter the Quantity';
+                                    } else {
+                                      return null;
+                                    }
+                                  },
                                   controller: item.quantity,
                                   keyboardType: TextInputType.number,
                                   decoration: const InputDecoration(
@@ -215,12 +207,12 @@ Future<void> loadInvoiceNumber() async {
                               Expanded(
                                 child: TextFormField(
                                   validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Enter the Amount';
-                          } else {
-                            return null;
-                          }
-                        },
+                                    if (value == null || value.isEmpty) {
+                                      return 'Enter the Amount';
+                                    } else {
+                                      return null;
+                                    }
+                                  },
                                   controller: item.amount,
                                   keyboardType: TextInputType.number,
                                   decoration: const InputDecoration(
@@ -273,7 +265,7 @@ Future<void> loadInvoiceNumber() async {
                                 address: address.text,
                                 date: date.text,
                                 invoiceNo: invoiceNo.text,
-                              products: products,
+                                products: products,
                               ),
                             ),
                           );
