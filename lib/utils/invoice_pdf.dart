@@ -108,16 +108,13 @@ class InvoicePdf {
                                 ),
                                 pw.SizedBox(height: 5),
 
-                                pw.Text("No.115, New Jail Road"),
+                                pw.Text("No.116, Simmakal,"),
                                 pw.SizedBox(height: 5),
 
                                 pw.Text("Madurai-625016"),
                                 pw.SizedBox(height: 5),
                                 pw.Text("State Name : Tamil Nadu"),
                                 pw.SizedBox(height: 5),
-                                pw.Text(
-                                  "E-Mail : uniteditsolutions28@gmail.com",
-                                ),
                               ],
                             ),
                           ),

@@ -337,29 +337,27 @@ class _MachineDetailPage extends ConsumerState<MachineDetailPage> {
                                   color: const Color.fromARGB(38, 104, 58, 183),
                                   borderRadius: BorderRadius.circular(5),
                                 ),
-                                child: IntrinsicHeight(
-                                  child: Row(
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          SizedBox(
-                                            // width: MediaQuery.of(context).size.width * 0.7,
-                                            child: Text(
-                                              problemdetail.problem,
-                                              style: TextStyle(fontSize: 18),
-                                            ),
+                                child: Row(
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                          width: MediaQuery.of(context).size.width * 0.7,
+                                          child: Text(
+                                            problemdetail.problem,
+                                            style: TextStyle(fontSize: 18),
                                           ),
-                                          Text(
-                                            '${problemdetail.date.day}/${problemdetail.date.month}/${problemdetail.date.year}',
-                                          ),
-                                        ],
-                                      ),
-                                      Spacer(),
-                                      Text('₹${problemdetail.amount}'),
-                                    ],
-                                  ),
+                                        ),
+                                        Text(
+                                          '${problemdetail.date.day}/${problemdetail.date.month}/${problemdetail.date.year}',
+                                        ),
+                                      ],
+                                    ),
+                                    Spacer(),
+                                    Text('₹${problemdetail.amount}'),
+                                  ],
                                 ),
                               );
                             },

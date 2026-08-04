@@ -18,98 +18,100 @@ Future<void> showFinanceDialog(BuildContext context) async {
           return AlertDialog(
             title: const Text('Add Transaction'),
 
-            content: SizedBox(
-              width: 350,
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-
-                    const Text(
-                      "Transaction Type",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    Wrap(
-                      spacing: 10,
-                      children: [
-
-                        ChoiceChip(
-                          label: const Text("Income"),
-                          selected: type == "income",
-                          selectedColor: Colors.green.shade100,
-                          onSelected: (_) {
-                            setState(() {
-                              type = "income";
-                            });
-                          },
+            content: SingleChildScrollView(
+              child: SizedBox(
+                width: 350,
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+              
+                      const Text(
+                        "Transaction Type",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
                         ),
-
-                        ChoiceChip(
-                          label: const Text("Expense"),
-                          selected: type == "expense",
-                          selectedColor: Colors.red.shade100,
-                          onSelected: (_) {
-                            setState(() {
-                              type = "expense";
-                            });
-                          },
+                      ),
+              
+                      const SizedBox(height: 10),
+              
+                      Wrap(
+                        spacing: 10,
+                        children: [
+              
+                          ChoiceChip(
+                            label: const Text("Income"),
+                            selected: type == "income",
+                            selectedColor: Colors.green.shade100,
+                            onSelected: (_) {
+                              setState(() {
+                                type = "income";
+                              });
+                            },
+                          ),
+              
+                          ChoiceChip(
+                            label: const Text("Expense"),
+                            selected: type == "expense",
+                            selectedColor: Colors.red.shade100,
+                            onSelected: (_) {
+                              setState(() {
+                                type = "expense";
+                              });
+                            },
+                          ),
+              
+                        ],
+                      ),
+              
+                      const SizedBox(height: 20),
+              
+                      TextFormField(
+                        controller: amountController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
                         ),
-
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    TextFormField(
-                      controller: amountController,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return "Enter amount";
+                          }
+              
+                          if (double.tryParse(value) == null) {
+                            return "Invalid amount";
+                          }
+              
+                          return null;
+                        },
+                        decoration: const InputDecoration(
+                          labelText: "Amount",
+                          prefixText: "₹ ",
+                          border: OutlineInputBorder(),
+                        ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return "Enter amount";
-                        }
-
-                        if (double.tryParse(value) == null) {
-                          return "Invalid amount";
-                        }
-
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: "Amount",
-                        prefixText: "₹ ",
-                        border: OutlineInputBorder(),
+              
+                      const SizedBox(height: 20),
+              
+                      TextFormField(
+                        controller: noteController,
+                        maxLines: 3,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return "Enter note";
+                          }
+              
+                          return null;
+                        },
+                        decoration: const InputDecoration(
+                          labelText: "Note",
+                          hintText: "Enter description...",
+                          border: OutlineInputBorder(),
+                          alignLabelWithHint: true,
+                        ),
                       ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    TextFormField(
-                      controller: noteController,
-                      maxLines: 3,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return "Enter note";
-                        }
-
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: "Note",
-                        hintText: "Enter description...",
-                        border: OutlineInputBorder(),
-                        alignLabelWithHint: true,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

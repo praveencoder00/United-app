@@ -43,6 +43,7 @@ class SimpleDialouges {
                     .collection('machines')
                     .doc(id)
                     .update({'status': status});
+                if (status == ' ') {}//send with estimate amount and final amount
 
                 final Uri url = Uri.parse(
                   "https://wa.me/91$number?text=${Uri.encodeComponent('Thanks for choosing United IT Solutions, your service request for machine $machineName is $status and will be delivered soon.')}",
@@ -135,10 +136,7 @@ class SimpleDialouges {
     );
   }
 
-    Future<void> deleteOnSiteDialouge(
-    BuildContext context,
-    String id,
-  ) async {
+  Future<void> deleteOnSiteDialouge(BuildContext context, String id) async {
     await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -166,11 +164,7 @@ class SimpleDialouges {
     );
   }
 
-  
-    Future<void> deleteSalesDialouge(
-    BuildContext context,
-    String id,
-  ) async {
+  Future<void> deleteSalesDialouge(BuildContext context, String id) async {
     await showDialog(
       context: context,
       builder: (BuildContext context) {
