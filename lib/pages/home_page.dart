@@ -29,7 +29,7 @@ class _HomePage extends ConsumerState<HomePage> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(title: Text('United IT Solutions')),
+      appBar: AppBar(title: Text('United It Services')),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await AddDialouge().addDialogue(context);

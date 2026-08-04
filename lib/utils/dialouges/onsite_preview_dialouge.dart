@@ -78,6 +78,7 @@ class OnsitePreviewDialouge {
                                           onsite.id!,
                                           onsite.customerNumber,
                                           onsite.problem,
+                                          null,null,
                                           true,
                                         );
                                     Navigator.pop(context);
@@ -100,6 +101,7 @@ class OnsitePreviewDialouge {
                                           onsite.id!,
                                           onsite.customerNumber,
                                           onsite.problem,
+                                          null,null,
                                           true,
                                         );
                                     Navigator.pop(context);

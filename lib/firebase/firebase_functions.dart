@@ -3,6 +3,7 @@ import 'package:united_app/models/finance_model.dart';
 import 'package:united_app/models/machine_model.dart';
 import 'package:united_app/models/onsite_model.dart';
 import 'package:united_app/models/problemLog_model.dart';
+import 'package:united_app/models/purchase_model.dart';
 import 'package:united_app/models/sales_model.dart';
 
 class FirestoreService {
@@ -445,6 +446,30 @@ Stream<List<Sales>> getSales() {
 }
   Future<void> deleteSales(String id)async{
     await _firestore.collection('sales').doc(id).delete();
+  }
+
+  //======================purchase====================
+
+  
+Future<void> addPurchase(Purchase purchase) async {
+  await _firestore
+      .collection('purchase')
+      .add(purchase.toMap());
+}
+
+Stream<List<Purchase>> getPurchase() {
+  return _firestore
+      .collection('purchase')
+      .orderBy('date', descending: true)
+      .snapshots()
+      .map(
+        (snapshot) => snapshot.docs
+            .map((doc) => Purchase.fromMap(doc.id, doc.data()))
+            .toList(),
+      );
+}
+  Future<void> deletePurchase(String id)async{
+    await _firestore.collection('purchase').doc(id).delete();
   }
 
 }

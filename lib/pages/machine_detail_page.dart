@@ -146,6 +146,8 @@ class _MachineDetailPage extends ConsumerState<MachineDetailPage> {
                                             data.id!,
                                             data.customerNumber,
                                             data.machineName,
+                                            data.estimatedAmount,
+                                            data.finalAmount,
                                             false
                                           );
                                     } else if (data.status == 'On proccess') {
@@ -173,6 +175,8 @@ class _MachineDetailPage extends ConsumerState<MachineDetailPage> {
                                             data.id!,
                                             data.customerNumber,
                                             data.machineName,
+                                              data.estimatedAmount,
+                                            data.finalAmount,
                                             false
                                           );
                                     }
@@ -235,7 +239,7 @@ class _MachineDetailPage extends ConsumerState<MachineDetailPage> {
                                     ? ElevatedButton(
                                         onPressed: () async {
                                           final Uri url = Uri.parse(
-                                            "https://wa.me/91$cusnumber?text=${Uri.encodeComponent('Thanks for choosing United IT Solutions, your service request for machine ${machineLocal.machineName} is Completed. Please make your payment of *${machineLocal.finalAmount} Rs* soon.')}",
+                                            "https://wa.me/91$cusnumber?text=${Uri.encodeComponent('Thanks for choosing United It Services, your service request for machine ${machineLocal.machineName} is Completed. Please make your payment of *${machineLocal.finalAmount} Rs* soon.')}",
                                           );
                                           await launchUrl(
                                             url,
@@ -258,7 +262,9 @@ class _MachineDetailPage extends ConsumerState<MachineDetailPage> {
                                     data.id!,
                                     data.customerNumber,
                                     data.machineName,
-                                    false
+                                      data.estimatedAmount,
+                                            data.finalAmount,
+                                            false
                                   );
                                 } else if (data.status == 'On proccess') {
                                   if (data.finalAmount == null) {
@@ -282,7 +288,9 @@ class _MachineDetailPage extends ConsumerState<MachineDetailPage> {
                                     data.id!,
                                     data.customerNumber,
                                     data.machineName,
-                                    false
+                                      data.estimatedAmount,
+                                            data.finalAmount,
+                                            false
                                   );
                                 }
                               },

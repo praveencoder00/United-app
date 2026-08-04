@@ -11,6 +11,8 @@ class SimpleDialouges {
     String id,
     String number,
     String machineName,
+    int? estimatedAmount,
+    int? finalAmount,
     bool fromOnsite,
   ) async {
     await showDialog(
@@ -43,12 +45,21 @@ class SimpleDialouges {
                     .collection('machines')
                     .doc(id)
                     .update({'status': status});
-                if (status == ' ') {}//send with estimate amount and final amount
-
-                final Uri url = Uri.parse(
-                  "https://wa.me/91$number?text=${Uri.encodeComponent('Thanks for choosing United IT Solutions, your service request for machine $machineName is $status and will be delivered soon.')}",
+                if (status == 'On proccess') {
+                   final Uri url = Uri.parse(
+                  "https://wa.me/91$number?text=${Uri.encodeComponent('Thanks for choosing United It Services, your service request for machine $machineName is $status and will be delivered soon. Estimated amount is $estimatedAmount')}",
                 );
                 await launchUrl(url, mode: LaunchMode.externalApplication);
+
+                } else if (status == 'Completed') {
+                   final Uri url = Uri.parse(
+                  "https://wa.me/91$number?text=${Uri.encodeComponent('Thanks for choosing United It Services, your service request for machine $machineName is $status and will be delivered soon. Final amount is $finalAmount')}",
+                );
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+
+                } //send with estimate amount and final amount
+
+               
                 Navigator.of(context).pop();
               },
               child: Text('Yes'),
@@ -182,6 +193,34 @@ class SimpleDialouges {
             ElevatedButton(
               onPressed: () async {
                 await FirestoreService().deleteSales(id);
+                Navigator.of(context).pop();
+              },
+              child: Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+    Future<void> deletePurchaseDialouge(BuildContext context, String id) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Entry'),
+          content: Text('Are you sure want to Delete the entry?'),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await FirestoreService().deletePurchase(id);
                 Navigator.of(context).pop();
               },
               child: Text('Yes'),

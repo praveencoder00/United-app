@@ -4,6 +4,7 @@ import 'package:united_app/firebase/firebase_functions.dart';
 import 'package:united_app/models/finance_model.dart';
 import 'package:united_app/models/machine_model.dart';
 import 'package:united_app/models/onsite_model.dart';
+import 'package:united_app/models/purchase_model.dart';
 import 'package:united_app/models/sales_model.dart';
 import 'package:united_app/providers/machine_providers.dart';
 import 'package:united_app/utils/dialouges/simple_dialouges.dart';
@@ -14,6 +15,7 @@ class SalesDialouge {
     TextEditingController customerNumber = TextEditingController();
     TextEditingController product = TextEditingController();
     TextEditingController amount = TextEditingController();
+    TextEditingController nos = TextEditingController();
     bool isLoading = false;
 
 
@@ -36,12 +38,13 @@ class SalesDialouge {
               try {
                 if (fromKey.currentState!.validate() 
                    ) {
-                  Sales machineModel = Sales(
+                  Purchase machineModel = Purchase(
                     customerName: customerName.text,
                     amount: int.parse(amount.text) ,
                     productName: product.text,
                     customerNumber: customerNumber.text,
                     date: DateTime.now(),
+                    nos: int.parse(nos.text),
                    
                   );
                  
@@ -52,7 +55,7 @@ class SalesDialouge {
                       id: '',
                       amount: double.parse(amount.text.trim()),
                       note: '${customerName.text}--${product.text}',
-                      type: 'income',
+                      type: 'expense',
                       createdAt: now,
                       year: now.year,
                       month: now.month,
@@ -63,7 +66,7 @@ class SalesDialouge {
                       finance,
                     );
                   
-                   await FirestoreService().addSale(
+                   await FirestoreService().addPurchase(
                       machineModel,
             
                     );
@@ -194,7 +197,7 @@ class SalesDialouge {
                               children: [
                                 Icon(Icons.person),
                                 SizedBox(width: 10),
-                                Text('Customer name'),
+                                Text('Dealer name'),
                               ],
                             ),
                           ),
@@ -216,6 +219,26 @@ class SalesDialouge {
                                 Icon(Icons.shopify_rounded),
                                 SizedBox(width: 10),
                                 Text('Product'),
+                              ],
+                            ),
+                          ),
+                        ),
+                        TextFormField(
+                          controller: nos,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Enter the number';
+                            } else {
+                              return null;
+                            }
+                          },
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            label: Row(
+                              children: [
+                                Icon(Icons.shopify_rounded),
+                                SizedBox(width: 10),
+                                Text('Nos'),
                               ],
                             ),
                           ),
